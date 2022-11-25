@@ -316,12 +316,12 @@ footer{
 
 }
 .edit-bookmark {
-display: flex;
-font-size: 1.3em;
-color: rgb(63, 63, 63);
-margin-bottom: 2px;
-transition:color .4s, font-weight .4s;
-cursor: pointer;
+  display: flex;
+  font-size: 1.3em;
+  color: rgb(63, 63, 63);
+  margin-bottom: 2px;
+  transition:color .4s, font-weight .4s;
+  cursor: pointer;
 }
 .edit-bookmark input[type=text] {
     width: 95%;
@@ -362,7 +362,7 @@ cursor: pointer;
     display:inline-block;
     min-width: 400px;
 }
- .mp-nav p, .mp-nav span, .mp-nav button, #mpTimer {
+ .mp-nav p, .mp-nav span, .mp-nav button, .mp-time {
     display: inline-block;
     margin-right:5px;
 }
