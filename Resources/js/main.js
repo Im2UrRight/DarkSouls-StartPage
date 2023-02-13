@@ -63,8 +63,6 @@ newBkmkForm.addEventListener('submit', e => {
     
     
 })
-//edit button
-
 //=========================
 //Functions
 //=========================
