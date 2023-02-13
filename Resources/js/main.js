@@ -22,7 +22,6 @@ let selectedListId = sessionStorage.getItem(LOCAL_STORAGE_SELECTED_LIST_KEY)
 modalBtn.addEventListener('click',function(){
     settingsModal.classList.add('modal-active')
     deleteItemBtn = document.querySelectorAll('.delete')
-    addEL()
 })
 //close settings
 closeSettingsBtn.addEventListener('click',function(){
@@ -42,17 +41,26 @@ listsContainer.addEventListener('click', e => {
     }
 })
 //create new bookmark
-newBkmkBtn.addEventListener('click', function() {
+newBkmkBtn.addEventListener('click', e => {
+    e.preventDefault()
     newBkmkInputContainer.classList.remove('hidden')
 })
 newBkmkForm.addEventListener('submit', e => {
     e.preventDefault()
-    const bkmkName  = newBkmkNameInput.value
-    const bkmkUrl = newBkmkUrlInput.value
-    if(bkmkName == null || bkmkUrl == null || bkmkName =='' || bkmkUrl == "") return
-    const newBookmark = createBookmark(bkmkName, bkmkUrl)
+    let bkmkName  = newBkmkNameInput
+    let bkmkUrl = newBkmkUrlInput
+    //add error return
+    if(bkmkName.value == null || bkmkUrl.value == null || bkmkName.value =='' || bkmkUrl.value == "") return
+    //add valid link return
+
+    //add new bookmark to list and remove new tab form
+    const newBookmark = createBookmark(bkmkName.value, bkmkUrl.value)
     lists[selectedListId].links.push(newBookmark)
+    newBkmkInputContainer.classList.add('hidden')
+    bkmkName.reset()
+    bkmkUrl.reset()
     saveAndRender()
+    
     
 })
 //edit button
@@ -63,54 +71,7 @@ newBkmkForm.addEventListener('submit', e => {
 function createBookmark(name, url) {
     return {name: name, url: url}
 }
-//function for adding event listeners after elements have been rendered
-function addEL() {
-    //delete button
-    let deleteItemBtn = document.querySelectorAll('.delete')
-    deleteItemBtn.forEach(button => {
-        button.addEventListener('click', e => {
-            e.target.parentNode.parentNode.remove()
-            lists[selectedListId].links = lists[selectedListId].links.splice(e.target.id)
-            saveAndRender()
-        })
 
-    })
-    //edit-save button
-    let editBtn = document.querySelectorAll('.edit')
-    editBtn.forEach(button => {
-        button.addEventListener('click', e => {
-            //edit
-            let nameInput = document.getElementById('nameInput'+e.target.id)
-            let urlInput = document.getElementById('urlInput'+e.target.id)
-            if(e.target.innerText == 'edit'){
-                e.target.innerText = 'save'
-                e.target.classList.remove('edit')
-                e.target.classList.add('save')
-            
-                
-                console.log(nameInput.value +' '+urlInput.value)
-                nameInput.disabled = false
-                urlInput.disabled = false
-                urlInput.classList.remove('hidden')
-                return
-            }
-            //save
-            e.target.innerText = 'edit'
-            e.target.classList.remove('save')
-            e.target.classList.add('edit')
-            lists[selectedListId].links[e.target.id] = createBookmark(nameInput.value, urlInput.value)
-            saveAndRender()
-        })
-    })
-    //save title button
-    let saveTitle = document.getElementById("titleSave")
-    saveTitle.addEventListener('click', e => {
-        let titleInput = document.getElementById('title')
-        lists[selectedListId].title = titleInput.value
-        save()
-    })
-}
-//render
 function setDefault() {
     //default storage list
     if (lists.length === 0) {
@@ -139,7 +100,8 @@ function setDefault() {
                 title: "Social",
                 links: [
                     {name: "Facebook", url: "httpx://www.facebook.com/"},
-                    {name: "Twitter", url: "https://www.twitter.com/"}
+                    {name: "Twitter", url: "https://www.twitter.com/"},
+                    {name: "Reddit", url: "httpw://www.reddit.com/"}
                     ] 
             }
         ]
@@ -150,12 +112,6 @@ function setDefault() {
     selectedListId = 0
     save()
     }
-}
-function saveAndRender() {
-    save()
-    renderLists()
-    renderBKMKs()
-    addEL()
 }
 function save() {
     localStorage.setItem(LOCAL_STORAGE_LIST_KEY, JSON.stringify(lists))
@@ -176,21 +132,30 @@ function renderLists()   {
     })
 }
 function renderBKMKs() {
+    //for settings page
     clearElement(listDisplayContainer)
     //title input
     const listTitleInput = document.createElement('input')
     listTitleInput.id = "title"
     listTitleInput.type = "text"
     listTitleInput.value = lists[selectedListId].title
+
     const listTitleSaveBtn = document.createElement('button')
     listTitleSaveBtn.classList.add('save', 'btn')
     listTitleSaveBtn.innerText = 'save'
     listTitleSaveBtn.id = "titleSave"
     listDisplayContainer.appendChild(listTitleInput)
     listDisplayContainer.appendChild(listTitleSaveBtn)
+    //title input event listener
+    listTitleSaveBtn.addEventListener('click', () => {
+        let titleInput = document.getElementById('title')
+        lists[selectedListId].title = titleInput.value
+        save()
+    })
     //bookmark inputs
     let bkmkCount = 0
     lists[selectedListId].links.forEach( links => {
+
         const bkmkContainer = document.createElement('li')
         const inputContainer = document.createElement('div')
         const btnContainer = document.createElement('div')
@@ -225,16 +190,52 @@ function renderBKMKs() {
         inputContainer.appendChild(bkmkUrlInput)
         btnContainer.appendChild(editBtn)
         btnContainer.appendChild(deleteBtn)
+        
+        //edit-save button event listener
+        editBtn.addEventListener('click', e => {
+            //edit
+            let nameInput = document.getElementById("nameInput"+e.target.id)
+            let urlInput = document.getElementById("urlInput"+e.target.id)
+            console.log(e.target.id)
+            console.log(nameInput)
+            console.log(urlInput)
+            if(e.target.innerText == 'edit'){
+                e.target.innerText = 'save'
+                e.target.classList.remove('edit')
+                e.target.classList.add('save')
+            
+                
+                console.log(nameInput.value +' '+urlInput.value)
+                nameInput.disabled = false
+                urlInput.disabled = false
+                urlInput.classList.remove('hidden')
+                return
+            }
+            //save
+            e.target.innerText = 'edit'
+            e.target.classList.remove('save')
+            e.target.classList.add('edit')
+            lists[selectedListId].links[e.target.id] = createBookmark(nameInput.value, urlInput.value)
+            saveAndRender()
+        })
+        //delete button event listener
+        deleteBtn.addEventListener('click', e => {
+            console.log(e.target.id)
+            e.target.parentNode.parentNode.remove()
+            lists[selectedListId].links.splice(e.target.id,1)
+            saveAndRender()
+        })
+
         bkmkCount++
     })
-    //create new button
 }
+//new bookmark construncor function
 function newBkmk() {
     const bkmkContainer = document.createElement('li')
     const newSiteName = document.createElement('input')
     const newSiteUrl = document.createElement('input')
     const saveBtn = document.createElement('button')
-    const deleteBtn = document.createElement('button')
+    const cancelBtn = document.createElement('button')
 
     newSiteName.type = 'text'
     newSiteName.placeholder = "site name"
@@ -243,8 +244,8 @@ function newBkmk() {
 
     saveBtn.classList.add('edit-save', 'btn')
     saveBtn.innerText = "save"
-    deleteBtn.classList.add('delete', 'btn')
-    deleteBtn.innerText = "delete"
+    cancelBtn.classList.add('delete', 'btn')
+    cancelBtn.innerText = "delete"
     
     listDisplayContainer.appendChild(bkmkContainer)
     bkmkContainer.appendChild(newSiteName)
@@ -274,6 +275,12 @@ function renderCards() {
         })        
     })
 }
+function saveAndRender() {
+    save()
+    renderLists()
+    renderBKMKs()
+}
+// testing tools
 function clearElement(element) {
     while (element.firstChild) {
         element.removeChild(element.firstChild)
