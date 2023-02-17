@@ -359,11 +359,11 @@ footer{
     
 }
 .mp-nav {
-    display:inline-block;
+    display:inline-flex;
     min-width: 400px;
 }
  .mp-nav p, .mp-nav span, .mp-nav button, .mp-time {
-    display: flex;
+    display: inline-block;
     margin-right:5px;
 }
 .pb-container{
