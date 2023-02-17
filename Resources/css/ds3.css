@@ -363,7 +363,7 @@ footer{
     min-width: 400px;
 }
  .mp-nav p, .mp-nav span, .mp-nav button, .mp-time {
-    display: inline-block;
+    display: flex;
     margin-right:5px;
 }
 .pb-container{
